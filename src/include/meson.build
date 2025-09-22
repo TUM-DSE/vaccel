@@ -20,6 +20,7 @@ vaccel_public_headers = files([
   'vaccel/ops/minmax.h',
   'vaccel/ops/noop.h',
   'vaccel/ops/opencv.h',
+  'vaccel/ops/matmul.h',
   'vaccel/ops/tf.h',
   'vaccel/ops/tflite.h',
   'vaccel/ops/torch.h',

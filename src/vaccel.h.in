@@ -20,6 +20,7 @@
 #include "ops/fpga.h"
 #include "ops/genop.h"
 #include "ops/image.h"
+#include "ops/matmul.h"
 #include "ops/minmax.h"
 #include "ops/noop.h"
 #include "ops/opencv.h"

@@ -19,6 +19,7 @@
 #include "vaccel/ops/fpga.h"
 #include "vaccel/ops/genop.h"
 #include "vaccel/ops/image.h"
+#include "vaccel/ops/matmul.h"
 #include "vaccel/ops/minmax.h"
 #include "vaccel/ops/noop.h"
 #include "vaccel/ops/opencv.h"
