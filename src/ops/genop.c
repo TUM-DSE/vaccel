@@ -6,6 +6,7 @@
 #include "exec.h"
 #include "fpga.h"
 #include "image.h"
+#include "matmul.h"
 #include "minmax.h"
 #include "noop.h"
 #include "op.h"
@@ -43,6 +44,16 @@ unpack_func_t callbacks[VACCEL_OP_MAX] = {
 	vaccel_noop_unpack, /* 21 */
 	vaccel_noop_unpack, /* 22 */
 	vaccel_opencv_unpack, /* 23 */
+	vaccel_noop_unpack,
+	vaccel_noop_unpack,
+	vaccel_noop_unpack,
+	vaccel_matmul_create_unpack,
+	vaccel_create_mem_unpack,
+	vaccel_destroy_mem_unpack,
+	vaccel_matmul_destroy_unpack,
+	vaccel_matmul_set_io_mem_unpack,
+	vaccel_matmul_set_core_mask_unpack,
+	vaccel_matmul_run_unpack,
 };
 
 int vaccel_genop(struct vaccel_session *sess, struct vaccel_arg *read,
