@@ -393,6 +393,110 @@ int vaccel_matmul_run_unpack(struct vaccel_session *sess, struct vaccel_arg *rea
 	return vaccel_matmul_run(sess, ctx);
 }
 
+typedef int (*vaccel_matmul_set_matrix_fn_t)(struct vaccel_session *sess, vaccel_tensor_mem_handle* dst, void* src, size_t nbytes);
+int vaccel_matmul_set_matrix(struct vaccel_session *sess, vaccel_tensor_mem_handle* dst, void* src, size_t nbytes)
+{
+	int ret;
+
+	if (!sess)
+		return VACCEL_EINVAL;
+
+	vaccel_debug("session:%" PRId64
+		     " Looking for plugin implementing matmul_set_matrix",
+		     sess->id);
+
+	vaccel_prof_region_start(&rknn_op_stats);
+
+	vaccel_matmul_set_matrix_fn_t plugin_matmul_set_matrix=
+		plugin_get_op_func(VACCEL_OP_MATMUL_SET_MATRIX, sess->hint);
+	if (!plugin_matmul_set_matrix) {
+		ret = VACCEL_ENOTSUP;
+		goto out;
+	}
+
+	ret = plugin_matmul_set_matrix(sess, dst, src, nbytes);
+
+out:
+	vaccel_prof_region_stop(&rknn_op_stats);
+
+	return ret;
+}
+
+int vaccel_matmul_set_matrix_unpack(struct vaccel_session *sess, struct vaccel_arg *read,
+			     int nr_read, _unused struct vaccel_arg *write, int nr_write)
+{
+	if (nr_read != 3) {
+		vaccel_error("Wrong number of read arguments in matmul_set_matrix: %d",
+			     nr_read);
+		return VACCEL_EINVAL;
+	}
+
+	if (nr_write != 0) {
+		vaccel_error("Wrong number of write arguments in matmul_set_matrix: %d",
+			     nr_write);
+		return VACCEL_EINVAL;
+	}
+
+	vaccel_tensor_mem_handle* dst = *(vaccel_tensor_mem_handle**)read[0].buf;
+	void* src = read[1].buf;
+	size_t nbytes = *(size_t*)read[2].buf;
+
+
+	return vaccel_matmul_set_matrix(sess, dst, src, nbytes);
+}
+
+typedef int (*vaccel_matmul_get_matrix_fn_t)(struct vaccel_session *sess, void* dst, vaccel_tensor_mem_handle* src, size_t nbytes);
+int vaccel_matmul_get_matrix(struct vaccel_session *sess, void* dst, vaccel_tensor_mem_handle* src, size_t nbytes)
+{
+	int ret;
+
+	if (!sess)
+		return VACCEL_EINVAL;
+
+	vaccel_debug("session:%" PRId64
+		     " Looking for plugin implementing matmul_get_matrix",
+		     sess->id);
+
+	vaccel_prof_region_start(&rknn_op_stats);
+
+	vaccel_matmul_get_matrix_fn_t plugin_matmul_get_matrix=
+		plugin_get_op_func(VACCEL_OP_MATMUL_GET_MATRIX, sess->hint);
+	if (!plugin_matmul_get_matrix) {
+		ret = VACCEL_ENOTSUP;
+		goto out;
+	}
+
+	ret = plugin_matmul_get_matrix(sess, dst, src, nbytes);
+
+out:
+	vaccel_prof_region_stop(&rknn_op_stats);
+
+	return ret;
+}
+
+int vaccel_matmul_get_matrix_unpack(struct vaccel_session *sess, struct vaccel_arg *read,
+				    int nr_read, struct vaccel_arg *write, int nr_write)
+{
+	if (nr_read != 2) {
+		vaccel_error("Wrong number of read arguments in matmul_set_matrix: %d",
+			     nr_read);
+		return VACCEL_EINVAL;
+	}
+
+	if (nr_write != 1) {
+		vaccel_error("Wrong number of write arguments in matmul_set_matrix: %d",
+			     nr_write);
+		return VACCEL_EINVAL;
+	}
+
+	vaccel_tensor_mem_handle* src = *(vaccel_tensor_mem_handle**)read[0].buf;
+	size_t nbytes = *(size_t*)read[1].buf;
+
+	void* dst = write[0].buf;
+
+	return vaccel_matmul_get_matrix(sess, dst, src, nbytes);
+}
+
 __attribute__((constructor)) static void vaccel_ops_init(void)
 {
 }
